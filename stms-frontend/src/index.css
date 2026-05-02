@@ -1,0 +1,64 @@
+@import "tailwindcss";
+@config "../tailwind.config.js";
+@plugin "@tailwindcss/forms";
+
+@theme {
+  --color-primary: #006c49;
+  --color-primary-fixed: #6ffbbe;
+  --color-surface: #f8f9ff;
+  --color-surface-on: #0b1c30;
+  --color-surface-on-variant: #3c4a42;
+  --color-surface-variant: #d3e4fe;
+  --color-secondary: #2b6954;
+  --color-secondary-container: #adedd3;
+  --color-card-bg: #ffffff;
+  --color-border: #e2e8f0;
+}
+
+@layer base {
+  .dark {
+    --color-primary: #10b981;
+    --color-primary-fixed: #002113;
+    --color-surface: #0f172a;
+    --color-surface-on: #f8f9ff;
+    --color-surface-on-variant: #94a3b8;
+    --color-surface-variant: #1e293b;
+    --color-secondary: #74d8af;
+    --color-secondary-container: #1b4b3c;
+    --color-card-bg: #1e293b;
+    --color-border: #334155;
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-surface text-surface-on antialiased;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  @keyframes slide-in-right {
+    0% {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  .animate-slide-in-right {
+    animation: slide-in-right 0.3s ease-out forwards;
+  }
+}
