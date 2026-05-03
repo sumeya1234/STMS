@@ -80,7 +80,7 @@ const AlertModal = ({
                     <div className="mt-10 flex flex-col sm:flex-row-reverse gap-3">
                         <button
                             type="button"
-                            onClick={() => { onConfirm(); onClose(); }}
+                            onClick={async () => { await onConfirm(); onClose(); }}
                             className={`w-full inline-flex justify-center items-center py-3.5 px-6 border border-transparent rounded-button shadow-xl text-sm font-bold text-white ${colors.btn} transition-all transform active:scale-95 focus:outline-none`}
                         >
                             {confirmText}

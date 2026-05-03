@@ -8,10 +8,12 @@ const getDashStats = async (req, res) => {
         // Use a simple date object trick to get start and end of week (Sunday to Saturday)
         // Adjust depending on whether the week starts on Sunday or Monday in the locality
         const today = new Date();
-        const firstDay = new Date(today.setDate(today.getDate() - today.getDay()));
-        const lastDay = new Date(today.setDate(today.getDate() - today.getDay() + 6));
-
+        const dayOfWeek = today.getDay();
+        const firstDay = new Date(today);
+        firstDay.setDate(today.getDate() - dayOfWeek);
         firstDay.setHours(0, 0, 0, 0);
+        const lastDay = new Date(firstDay);
+        lastDay.setDate(firstDay.getDate() + 6);
         lastDay.setHours(23, 59, 59, 999);
 
         const firstDayStr = firstDay.toISOString().slice(0, 19).replace('T', ' ');
@@ -56,14 +58,17 @@ const getDashOverdue = async (req, res) => {
 
 const getDashUpcoming = async (req, res) => {
     try {
-        const today = new Date();
-        const nextWeek = new Date(today);
-        nextWeek.setDate(today.getDate() + 7);
-
-        const todayStr = today.toISOString().slice(0, 19).replace('T', ' ');
+        const now = new Date();
+        const nowStr = now.toISOString().slice(0, 19).replace('T', ' ');
+        const nextWeek = new Date(now);
+        nextWeek.setDate(now.getDate() + 7);
         const nextWeekStr = nextWeek.toISOString().slice(0, 19).replace('T', ' ');
 
-        const [tasks] = await pool.query('SELECT * FROM tasks WHERE user_id = ? AND status != "completed" AND deadline >= ? AND deadline <= ? ORDER BY deadline ASC', [req.user.id, todayStr, nextWeekStr]);
+        const [tasks] = await pool.query(
+            `SELECT t.*, c.name as category_name FROM tasks t LEFT JOIN categories c ON t.category_id = c.id 
+             WHERE t.user_id = ? AND t.status != 'completed' AND t.deadline >= ? AND t.deadline <= ? ORDER BY t.deadline ASC`,
+            [req.user.id, nowStr, nextWeekStr]
+        );
 
         return successResponse(res, 'Upcoming tasks fetched', tasks);
     } catch (err) {

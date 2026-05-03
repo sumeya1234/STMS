@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import api from '../api/axios';
 import { useToastStore } from '../store/toastStore';
@@ -10,12 +10,16 @@ const EmailVerification = () => {
     const { addToast } = useToastStore();
 
     const [status, setStatus] = useState('verifying'); // verifying, success, error
+    const hasRun = useRef(false);
 
     useEffect(() => {
         if (!token) {
             setStatus('error');
             return;
         }
+        // Guard against React Strict Mode double-invocation
+        if (hasRun.current) return;
+        hasRun.current = true;
 
         const verifyToken = async () => {
             try {
@@ -28,7 +32,7 @@ const EmailVerification = () => {
         };
 
         verifyToken();
-    }, [token, addToast]);
+    }, [token]);
 
     return (
         <div className="min-h-screen bg-surface flex items-center justify-center p-4 selection:bg-primary/30">

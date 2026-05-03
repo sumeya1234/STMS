@@ -22,7 +22,7 @@ const Settings = () => {
 
     useEffect(() => {
         fetchProfile();
-    }, []);
+    }, [fetchProfile]);
 
     useEffect(() => {
         if (user) {
@@ -72,18 +72,19 @@ const Settings = () => {
         queryFn: async () => {
             const res = await api.get('/users/me/preferences');
             return res.data.data;
-        },
-        onSuccess: (data) => {
-            if (data) {
-                setPrefs({
-                    dark_mode: !!data.dark_mode,
-                    task_reminders: !!data.task_reminders,
-                    weekly_digest: !!data.weekly_digest,
-                    auto_focus_mode: !!data.auto_focus_mode
-                });
-            }
         }
     });
+
+    useEffect(() => {
+        if (userPrefs) {
+            setPrefs({
+                dark_mode: !!userPrefs.dark_mode,
+                task_reminders: !!userPrefs.task_reminders,
+                weekly_digest: !!userPrefs.weekly_digest,
+                auto_focus_mode: !!userPrefs.auto_focus_mode
+            });
+        }
+    }, [userPrefs]);
 
     const updatePrefMutation = useMutation({
         mutationFn: async (newPrefs) => {
@@ -270,7 +271,7 @@ const Settings = () => {
                             {user?.google_id ? (
                                 <span className="text-[10px] text-primary bg-primary-fixed px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Linked</span>
                             ) : (
-                                <a href="http://localhost:5000/api/auth/google" className="text-xs text-primary hover:underline font-bold">Link Account</a>
+                                <a href={`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api/auth/google`} className="text-xs text-primary hover:underline font-bold">Link Account</a>
                             )}
                         </div>
                     </div>

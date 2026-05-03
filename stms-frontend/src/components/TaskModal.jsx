@@ -15,7 +15,8 @@ const TaskModal = ({ isOpen, onClose, taskToEdit = null }) => {
             const dateStr = new Date(taskToEdit.deadline).toISOString().slice(0, 16);
             reset({
                 ...taskToEdit,
-                deadline: dateStr
+                deadline: dateStr,
+                category_id: taskToEdit.category_id != null ? String(taskToEdit.category_id) : ''
             });
         } else {
             reset({
@@ -51,20 +52,22 @@ const TaskModal = ({ isOpen, onClose, taskToEdit = null }) => {
             addToast('Please select a deadline.', 'error');
             return false;
         }
+        const year = new Date(deadline).getFullYear();
+        if (year < 2024 || year > 2100) {
+            addToast('Deadline year must be between 2024 and 2100.', 'error');
+            return false;
+        }
         return true;
     };
 
     const mutation = useMutation({
         mutationFn: async (data) => {
             const dateObj = new Date(data.deadline);
-            const year = dateObj.getFullYear();
-
-            if (year < 2024 || year > 2100) {
-                throw new Error('Deadline must be between 2024 and 2100');
-            }
+            // Strip fields that must not be sent in the body (Joi rejects them)
+            const { id, user_id, status, created_at, updated_at, category_name, ...rest } = data;
 
             const payload = {
-                ...data,
+                ...rest,
                 priority: data.priority || 'medium',
                 deadline: dateObj.toISOString(),
                 category_id: data.category_id === '' ? null : data.category_id
@@ -219,10 +222,10 @@ const TaskModal = ({ isOpen, onClose, taskToEdit = null }) => {
                             <div className="pt-2 flex flex-col sm:flex-row-reverse gap-2">
                                 <button
                                     type="submit"
-                                    disabled={mutation.isLoading}
+                                    disabled={mutation.isPending}
                                     className="w-full sm:w-auto inline-flex justify-center items-center px-6 py-2.5 bg-primary text-white text-sm font-bold rounded-button shadow-lg shadow-primary/20 hover:bg-primary-tint active:scale-95 transition-all disabled:opacity-50"
                                 >
-                                    {mutation.isLoading ? '...' : (taskToEdit ? 'Save Changes' : 'Create Task')}
+                                    {mutation.isPending ? '...' : (taskToEdit ? 'Save Changes' : 'Create Task')}
                                 </button>
                                 <button
                                     type="button"

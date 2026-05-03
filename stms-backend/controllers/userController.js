@@ -24,25 +24,19 @@ const getMe = async (req, res) => {
 
 const updateProfile = async (req, res) => {
     try {
-        const schema = Joi.object({
-            name: Joi.string(),
-            university: Joi.string().allow('', null),
-            department: Joi.string().allow('', null),
-            year: Joi.string().allow('', null)
-        });
-
-        const { error } = schema.validate(req.body);
-        if (error) return errorResponse(res, error.details[0].message, 400);
-
-        const { name, university, department, year } = req.body;
-
-        await pool.query(
-            'UPDATE users SET name = COALESCE(?, name), university = COALESCE(?, university), department = COALESCE(?, department), year = COALESCE(?, year) WHERE id = ?',
-            [name, university, department, year, req.user.id]
-        );
-
+        const allowedFields = ['name', 'university', 'department', 'year'];
+        const setClauses = [];
+        const params = [];
+        for (const field of allowedFields) {
+            if (req.body[field] !== undefined) {
+                setClauses.push(`${field} = ?`);
+                params.push(req.body[field] || null);
+            }
+        }
+        if (setClauses.length === 0) return successResponse(res, 'Nothing to update');
+        params.push(req.user.id);
+        await pool.query(`UPDATE users SET ${setClauses.join(', ')} WHERE id = ?`, params);
         const [updated] = await pool.query('SELECT id, name, email, university, department, year FROM users WHERE id = ?', [req.user.id]);
-
         return successResponse(res, 'Profile updated successfully', updated[0]);
     } catch (err) {
         console.error(err);
@@ -91,9 +85,20 @@ const updatePreferences = async (req, res) => {
     }
 };
 
+const deleteAccount = async (req, res) => {
+    try {
+        await pool.query('DELETE FROM users WHERE id = ?', [req.user.id]);
+        return successResponse(res, 'Account deleted successfully');
+    } catch (err) {
+        console.error(err);
+        return errorResponse(res, 'Server error deleting account', 500);
+    }
+};
+
 module.exports = {
     getMe,
     updateProfile,
     getPreferences,
-    updatePreferences
+    updatePreferences,
+    deleteAccount
 };

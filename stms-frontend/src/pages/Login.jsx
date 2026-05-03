@@ -107,7 +107,7 @@ const Login = () => {
                     </div>
 
                     <div>
-                        <a href="http://localhost:5000/api/auth/google" className="w-full flex justify-center items-center py-3 px-4 border border-border rounded-button shadow-sm text-sm font-bold text-surface-on bg-surface dark:bg-slate-800 hover:bg-surface-bright active:scale-95 transition-all duration-150">
+                        <a href={`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api/auth/google`} className="w-full flex justify-center items-center py-3 px-4 border border-border rounded-button shadow-sm text-sm font-bold text-surface-on bg-surface dark:bg-slate-800 hover:bg-surface-bright active:scale-95 transition-all duration-150">
                             <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="h-5 w-5 mr-3" />
                             Google Account
                         </a>

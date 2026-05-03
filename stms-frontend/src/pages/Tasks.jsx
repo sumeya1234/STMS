@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import Layout from '../components/Layout';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../api/axios';
 import { Clock, Plus, Filter, Circle, CheckCircle2, Edit2, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import TaskModal from '../components/TaskModal';
 import AlertModal from '../components/AlertModal';
 import { useToastStore } from '../store/toastStore';
@@ -13,25 +13,36 @@ const Tasks = () => {
     const queryClient = useQueryClient();
     const { addToast } = useToastStore();
     const [searchParams] = useSearchParams();
-    const [filter, setFilter] = useState('all'); // all, pending, completed
-    const [sort, setSort] = useState('deadline'); // deadline, priority, created_at
+    const navigate = useNavigate();
+    const [filter, setFilter] = useState('all');
+    const [sort, setSort] = useState('deadline');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [taskToEdit, setTaskToEdit] = useState(null);
 
     // Alert Modal State
     const [alertConfig, setAlertConfig] = useState({ isOpen: false, taskId: null });
 
+    const openAddModal = useCallback(() => {
+        setTaskToEdit(null);
+        setIsModalOpen(true);
+    }, []);
+
     React.useEffect(() => {
         if (searchParams.get('action') === 'new') {
             openAddModal();
+            // Clear the param so the modal doesn't reopen after task creation
+            navigate('/tasks', { replace: true });
         }
-    }, [searchParams]);
+    }, [searchParams, openAddModal, navigate]);
+
+    const searchTerm = searchParams.get('search') || '';
 
     const { data: tasks, isLoading } = useQuery({
-        queryKey: ['tasks', filter, sort],
+        queryKey: ['tasks', filter, sort, searchTerm],
         queryFn: async () => {
             const statusFilter = filter !== 'all' ? `&status=${filter}` : '';
-            const res = await api.get(`/tasks?sortby=${sort}${statusFilter}`);
+            const searchFilter = searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : '';
+            const res = await api.get(`/tasks?sortby=${sort}${statusFilter}${searchFilter}`);
             return res.data.data;
         }
     });
@@ -70,10 +81,6 @@ const Tasks = () => {
         statusMutation.mutate({ id: task.id, status: newStatus });
     };
 
-    const openAddModal = () => {
-        setTaskToEdit(null);
-        setIsModalOpen(true);
-    };
 
     const openEditModal = (task) => {
         setTaskToEdit(task);

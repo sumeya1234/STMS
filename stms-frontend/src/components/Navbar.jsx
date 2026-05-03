@@ -22,7 +22,8 @@ const Navbar = () => {
             const res = await api.get('/notifications');
             return res.data.data;
         },
-        refetchInterval: 60000 // Refetch every minute
+        refetchInterval: 60000,
+        refetchIntervalInBackground: false
     });
 
     const readMutation = useMutation({
@@ -36,7 +37,8 @@ const Navbar = () => {
 
     const handleSearch = (e) => {
         if (e.key === 'Enter' && searchQuery.trim() !== '') {
-            addToast(`Searching for: ${searchQuery}`, 'info');
+            navigate(`/tasks?search=${encodeURIComponent(searchQuery.trim())}`);
+            setSearchQuery('');
         }
     };
 

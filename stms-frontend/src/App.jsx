@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard';
 import Tasks from './pages/Tasks';
 import CalendarView from './pages/Calendar';
 import Settings from './pages/Settings';
+import OAuthCallback from './pages/OAuthCallback';
 import ToastContainer from './components/ToastContainer';
 
 const ProtectedRoute = ({ children }) => {
@@ -28,17 +29,9 @@ const App = () => {
   }, [token, isAuthenticated, fetchProfile]);
 
   useEffect(() => {
-    // Priority: user preference > localStorage preference > system preference
-    const isDark = (user && user.dark_mode) ||
-      (localStorage.getItem('theme') === 'dark') ||
-      (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
-
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [user]);
+    const isDark = !!user?.dark_mode;
+    document.documentElement.classList.toggle('dark', isDark);
+  }, [user?.dark_mode]);
 
   return (
     <Router>
@@ -73,6 +66,8 @@ const App = () => {
             <Settings />
           </ProtectedRoute>
         } />
+
+        <Route path="/oauth-callback" element={<OAuthCallback />} />
 
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>

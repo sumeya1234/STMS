@@ -5,9 +5,9 @@ const Joi = require('joi');
 const createTask = async (req, res) => {
     try {
         const schema = Joi.object({
-            title: Joi.string().required(),
-            description: Joi.string().allow('', null),
-            subject: Joi.string().required(),
+            title: Joi.string().min(3).max(50).required(),
+            description: Joi.string().max(500).allow('', null),
+            subject: Joi.string().min(2).max(30).required(),
             deadline: Joi.date().iso().required(),
             priority: Joi.string().valid('low', 'medium', 'high').default('medium'),
             category_id: Joi.number().integer().allow(null)
@@ -150,6 +150,15 @@ const updateTask = async (req, res) => {
         const [existing] = await pool.query('SELECT * FROM tasks WHERE id = ? AND user_id = ?', [id, req.user.id]);
         if (existing.length === 0) return errorResponse(res, 'Task not found', 404);
 
+        // §1.4: Verify category belongs to the user
+        if (req.body.category_id) {
+            const [cat] = await pool.query(
+                'SELECT id FROM categories WHERE id = ? AND user_id = ?',
+                [req.body.category_id, req.user.id]
+            );
+            if (cat.length === 0) return errorResponse(res, 'Invalid category', 403);
+        }
+
         const updates = req.body;
         let queryParams = [];
         let setClauses = [];
@@ -171,7 +180,10 @@ const updateTask = async (req, res) => {
             await pool.query(`UPDATE tasks SET ${setClauses.join(', ')} WHERE id = ?`, queryParams);
         }
 
-        const [updated] = await pool.query('SELECT * FROM tasks WHERE id = ?', [id]);
+        const [updated] = await pool.query(
+            `SELECT t.*, c.name as category_name FROM tasks t LEFT JOIN categories c ON t.category_id = c.id WHERE t.id = ?`,
+            [id]
+        );
         return successResponse(res, 'Task updated successfully', updated[0]);
     } catch (err) {
         console.error(err);
