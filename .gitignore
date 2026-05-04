@@ -1,0 +1,8 @@
+design.md
+.env
+node_modules
+requirements.md
+STMS_Database_Schema.sql
+STMS_ER_Diagram.png
+/stitch_acadtrack_academic_management_system
+/stms-frontend/dist

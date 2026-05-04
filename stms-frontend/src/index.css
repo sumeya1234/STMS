@@ -1,0 +1,143 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
+
+:root {
+    --primary: #006c49;
+    --on-primary: #ffffff;
+    --primary-container: #10b981;
+    --on-primary-container: #00422b;
+    --secondary-container: #fea619;
+    --on-secondary-container: #684000;
+    --tertiary-container: #71af97;
+    --on-tertiary-container: #004231;
+    --surface: #f4fbf4;
+    --on-surface: #161d19;
+    --surface-variant: #dde4dd;
+    --on-surface-variant: #3c4a42;
+    --outline: #6c7a71;
+    --outline-variant: #bbcabf;
+    --error: #ba1a1a;
+    --on-error: #ffffff;
+    --surface-container-lowest: #ffffff;
+    --surface-container-low: #eef6ee;
+    --surface-container: #e8f0e9;
+    --surface-container-high: #e3eae3;
+    --surface-container-highest: #dde4dd;
+}
+
+@layer base {
+    body {
+        @apply bg-surface text-on-surface font-body-md antialiased;
+    }
+}
+
+@layer utilities {
+    .text-h1 {
+        font-family: 'Poppins', sans-serif;
+        font-size: 48px;
+        font-weight: 700;
+        line-height: 1.2;
+        letter-spacing: -0.02em;
+    }
+
+    .text-h2 {
+        font-family: 'Poppins', sans-serif;
+        font-size: 32px;
+        font-weight: 700;
+        line-height: 1.3;
+    }
+
+    .text-h3 {
+        font-family: 'Poppins', sans-serif;
+        font-size: 24px;
+        font-weight: 600;
+        line-height: 1.4;
+    }
+
+    .text-body-lg {
+        font-family: 'Inter', sans-serif;
+        font-size: 18px;
+        font-weight: 400;
+        line-height: 1.6;
+    }
+
+    .text-body-md {
+        font-family: 'Inter', sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 1.5;
+    }
+
+    .text-body-sm {
+        font-family: 'Inter', sans-serif;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.5;
+    }
+
+    .text-label-caps {
+        font-family: 'Inter', sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+
+    .text-button-text {
+        font-family: 'Inter', sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        line-height: 1;
+    }
+
+    .text-caption {
+        font-family: 'Inter', sans-serif;
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 1.4;
+    }
+
+    .animate-fade-in-up {
+        animation: fadeInUp 0.4s ease-out forwards;
+    }
+
+    .animate-fade-in-right {
+        animation: fadeInRight 0.4s ease-out forwards;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.fill-icon {
+    font-variation-settings: 'FILL' 1;
+}
